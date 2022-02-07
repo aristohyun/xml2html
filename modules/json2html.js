@@ -355,6 +355,7 @@ module.exports = {
   back: function (Obj) {
     let text = "";
     Obj["back"].forEach(function (obj) {
+      if (obj.hasOwnProperty("fn-group")) return;
       if (obj.hasOwnProperty("ref-list")) return;
       Object.keys(obj).forEach(function (key) {
         text += getSectorText(obj[key], 1);
