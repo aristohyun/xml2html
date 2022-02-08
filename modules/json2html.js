@@ -7,7 +7,7 @@ const x2j = require("./xml2json"),
  * preString + true/false + nextString
  */
 function isBlank(prechar, nextchar = " ") {
-  let blank_chars = [",", ".", "!", "?", ":", ";", ")", "]", "}", ">"],
+  let blank_chars = [",", ".", "!", "?", ":", ")", "]", "}", ">"],
     no_blank_chars = ["(", "[", "{", "<", ".", ","];
 
   if (
@@ -51,10 +51,12 @@ function setFontTag(obj) {
 
   Object.keys(obj).forEach(function (key) {
     if (key == ":@") return "";
-    if (!used_keys.includes(key)) {
-      text += " " + parseP(obj[key]);
-    } else {
+    if (used_keys.includes(key)) {
       text += "<" + key + ">" + parseP(obj[key]) + "</" + key + ">";
+    } else if (key == "uri") {
+      text += obj[key][0]["#text"].replace(/\s/gi, "");
+    } else {
+      text += " " + parseP(obj[key]);
     }
   });
   return text;
@@ -122,28 +124,22 @@ function parseDispFormula(arr) {
 function parseFig(arr) {
   let label = "",
     caption = "",
-    img = "";
+    explain = "",
+    flag = false;
 
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].hasOwnProperty("label")) {
       label = parseP(arr[i].label);
+      flag = true;
+      if (label[label.length - 1] != ".") label += ".";
     } else if (arr[i].hasOwnProperty("caption")) {
       caption = parseP(arr[i].caption).replace("<br/>\n", "");
-    } else if (arr[i].hasOwnProperty("graphic")) {
-      img = arr[i][":@"]["@_href"];
+      flag = true;
     }
   }
+  if (flag) explain = "\n<p><strong>" + label + " " + caption + "</strong></p>";
 
-  return (
-    '<p><img alt="' +
-    img +
-    ' 이미지" src=""/></p>\n' +
-    "<p><strong>" +
-    label +
-    " " +
-    caption +
-    "</strong></p>\n\n"
-  );
+  return explain + "\n\n";
 }
 
 /**
@@ -154,23 +150,18 @@ function parseFig(arr) {
 function parseTableWrap(arr) {
   let label = "",
     caption = "",
-    table = "",
-    img = "",
-    foot = "";
+    foot = "",
+    explain = "",
+    flag = false;
 
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].hasOwnProperty("label")) {
       label = parseP(arr[i].label);
+      flag = true;
+      if (label[label.length - 1] != ".") label += ".";
     } else if (arr[i].hasOwnProperty("caption")) {
       caption = parseP(arr[i].caption).replace("<br/>\n", "");
-    } else if (arr[i].hasOwnProperty("table")) {
-      table =
-        "<table>" +
-        arr[i].table[0]["#text"].replace("graphic xlink:href", "img alt") +
-        "</table>\n";
-    } else if (arr[i].hasOwnProperty("graphic")) {
-      img =
-        '<p><img alt="' + arr[i][":@"]["@_href"] + ' 이미지" src=""/></p>\n';
+      flag = true;
     } else if (arr[i].hasOwnProperty("table-wrap-foot")) {
       foot +=
         "<p><strong>" +
@@ -178,18 +169,9 @@ function parseTableWrap(arr) {
         "</strong></p>";
     }
   }
+  if (flag) explain = "<p><strong>" + label + " " + caption + "</strong></p>\n";
 
-  return (
-    "<p><strong>" +
-    label +
-    " " +
-    caption +
-    "</strong></p>\n" +
-    table +
-    img +
-    foot +
-    "\n\n"
-  );
+  return explain + foot + "\n\n";
 }
 
 /**
