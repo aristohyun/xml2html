@@ -1,3 +1,4 @@
+// xml 형식의 string 데이터에서 태그별로 추출하여 json 형태로 변환
 module.exports = {
   parse : function(xml) {
     const fxp = require("fast-xml-parser"),

@@ -14,6 +14,7 @@ function getFiles(file, nowFolder) {
 }
 
 module.exports = {
+  // 현재 디렉토리 이하의 모든 .xml파일의 주소를 가져오는 함수
   getFiles: function (nowFolder) {
     let list = fs.readdirSync(nowFolder, { withFileTypes: true });
     list.forEach(function (file) {

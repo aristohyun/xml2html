@@ -3,6 +3,7 @@ const fs = require("fs"),
   xml2json = require("./modules/xml2json"),
   parser = require("./modules/json2html");
 
+// 현재 디렉토리 이하의 모든 .xml 파일의 주소를 가져옴
 let files = get_xml.getFiles("."),
   log = "",
   i = 0,
@@ -11,8 +12,11 @@ let files = get_xml.getFiles("."),
 
 for (i = 0; i < files.length; i++) {
   let route = files[i];
+  
+  // 문서를 너무 많이 변환하는 경우 오류가 생겨 3천개로 제한
   if (i == 3000) break;
 
+  // 주소 마지막에는 파일 이름일테니, 자른 후 이름으로 사용
   let name = route.split("/");
   name = name[name.length - 1];
 
@@ -58,6 +62,8 @@ for (i = 0; i < files.length; i++) {
   }
 }
 
+// 만일 3천으로 끝났다면, 이는 파일이 너무 많이 변환되어 중간에 끊겼을 가능성이 높으니 
+// 마지막으로 변환된 파일을 기록해줌
 if (i == 3000) {
   log += "\n\nlast converted file : " + last + "\n\n";
 }

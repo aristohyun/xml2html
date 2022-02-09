@@ -53,6 +53,9 @@ function setFontTag(obj) {
     if (key == ":@") return "";
     if (used_keys.includes(key)) {
       text += "<" + key + ">" + parseP(obj[key]) + "</" + key + ">";
+    } else if (key == "overline"){
+        let latex = '\\bar{' + parseP(obj[key]) + '}';
+        text += '<span class="math-tex">' + "\\(" + latex + "\\)" + "</span>";
     } else if (key == "uri") {
       text += obj[key][0]["#text"].replace(/\s/gi, "");
     } else {
@@ -340,7 +343,9 @@ module.exports = {
       if (obj.hasOwnProperty("fn-group")) return;
       if (obj.hasOwnProperty("ref-list")) return;
       Object.keys(obj).forEach(function (key) {
-        text += getSectorText(obj[key], 1);
+        let temp = getSectorText(obj[key], 1);
+        if(temp.match("<h1>ORCID</h1>")) return;
+        text += temp;
       });
     });
     return text;
